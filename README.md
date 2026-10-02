@@ -1,6 +1,6 @@
-# Ollama Skills Collection
+# Agent Arsenal
 
-A comprehensive collection of 2,800+ agentic capabilities, security assessment playbooks, and service automation skills for Ollama and local LLM agents.
+A comprehensive collection of 2,800+ agentic capabilities, security assessment playbooks, and service automation skills for AI agents and LLMs.
 
 ## Overview
 
