@@ -1,20 +1,36 @@
-# Agent Arsenal
+# Agent Arsenal (Cybersecurity Edition)
 
-A comprehensive collection of 2,800+ agentic capabilities, security assessment playbooks, and service automation skills for AI agents and LLMs.
+A curated collection of 1,150+ operational cybersecurity capabilities, red team playbooks, blue team detection workflows, and threat assessment skills for AI agents and LLMs.
 
 ---
 
-## Overview
+## 19 Core Cyber Domains
 
-This repository provides modular, production-ready skills with structured YAML frontmatter, execution workflows, automated playbooks, and tool schemas spanning:
+The repository is structured across 19 specialized operational cybersecurity categories:
 
-* **Security & Vulnerability Assessment**: Reconnaissance, network scanning, cloud security, web penetration testing, and incident response.
-* **Service Integrations & API Automations**: Cloud providers, SaaS platforms, databases, and developer tooling.
-* **Agentic Workflows**: Multi-step reasoning templates, verification patterns, and operational execution scripts.
+| Domain | Directory | Focus & Capabilities |
+| :--- | :--- | :--- |
+| **01** | `01-recon-osint` | Active/passive OSINT, subdomain discovery, certificate transparency, port surface mapping |
+| **02** | `02-vulnerability-scanner` | Automated defect verification, surface scanning, CVE audit workflows |
+| **03** | `03-exploit-development` | Benign PoCs, buffer boundary analysis, payload formatting, shellcode testing |
+| **04** | `04-reverse-engineering` | Static & dynamic binary analysis, Ghidra, IDA Pro, Radare2, decompilation |
+| **05** | `05-malware-analysis` | Artifact extraction, PE header triage, deobfuscation, sandbox behavioral analysis |
+| **06** | `06-threat-hunting` | Hypothesis generation, MITRE ATT&CK mapping, Zeek analysis, LOLBINs hunting |
+| **07** | `07-incident-response` | Breach containment, digital forensics, timeline reconstruction (Plaso/Hayabusa) |
+| **08** | `08-network-security` | Packet capture analysis (Wireshark/Tshark), traffic baselining, firewall hardening |
+| **09** | `09-web-security` | OWASP Top 10 auditing: SQLi, XSS, SSRF, IDOR, race conditions, CORS, JWT flaws |
+| **10** | `10-cloud-security` | AWS, Azure, and GCP IAM misconfigurations, container escape, Kubernetes RBAC |
+| **11** | `11-csoc-automation` | Alert triage optimization, SIEM correlation rules, SOAR playbooks |
+| **12** | `12-log-analysis` | Windows Event Logs, Sysmon, Linux auditd, Athena queries, Splunk SPL |
+| **13** | `13-crypto-analysis` | TLS/SSL cipher testing, post-quantum migration, algorithm confusion verification |
+| **14** | `14-red-team-ops` | Active Directory exploitation (BloodHound, Kerberoasting, DCSync), C2 operations |
+| **15** | `15-blue-team-defense` | AppLocker policies, CIS Benchmarks, endpoint detection (Wazuh, Falco), Zero Trust |
+| **16** | `16-ai-llm-security` | Indirect prompt injection, model extraction, RAG poisoning, guardrail testing |
+| **17** | `17-mobile-security` | Android/iOS static analysis (MobSF, Jadx), intent vulnerabilities, cert pinning |
+| **18** | `18-ot-ics-security` | SCADA/ICS protocols (Modbus, DNP3, S7comm), Purdue model, IoT firmware audit |
+| **19** | `19-grc-compliance` | ISO 27001, SOC 2 Type II, HIPAA, NIST CSF/RMF, CMMC Level 2, PCI-DSS audit prep |
 
-Each skill folder contains:
-* `SKILL.md`: Metadata (`name`, `description`), operational guidelines, prerequisites, and step-by-step instructions.
-* Supporting scripts, reference materials, or automation schemas where applicable.
+In addition to the 19 numbered foundation directories, over 1,130 modular atomic skills (prefixed by `hunt-`, `analyzing-`, `detecting-`, `exploiting-`, `hardening-`, `testing-`, `triaging-`, `offensive-`, and `ctf-`) provide granular, task-specific execution playbooks.
 
 ---
 
@@ -23,99 +39,95 @@ Each skill folder contains:
 ### 1. Command Line Interfaces (CLIs)
 
 #### A. Ollama CLI
-Bake any skill directly into a custom Ollama model via `Modelfile`:
+Bake any cybersecurity skill directly into a custom local model via `Modelfile`:
 
 ```bash
-# Generate Modelfile with your chosen skill
+# Clone the repository
+git clone https://github.com/tejassroot/agent-arsenal.git
+cd agent-arsenal
+
+# Bake a skill into an Ollama model
 cat << 'EOF' > Modelfile
 FROM llama3.2
-PARAMETER temperature 0.2
+PARAMETER temperature 0.1
 SYSTEM """
 EOF
 
 cat subdomain-enumeration/SKILL.md >> Modelfile
 echo '"""' >> Modelfile
 
-# Build and run your custom agent
+# Build and execute
 ollama create sec-recon-agent -f Modelfile
 ollama run sec-recon-agent "Enumerate subdomains for example.com"
 ```
 
 #### B. `llm` CLI (Simon Willison's LLM)
-Use any skill as an immediate system prompt or save it as a permanent reusable template:
+Run skills on-demand or store them as reusable templates:
 
 ```bash
-# Run ad-hoc with skill as system prompt
-llm -s "$(cat subdomain-enumeration/SKILL.md)" "Enumerate subdomains for target.com"
+# Execute on-the-fly with skill context
+llm -s "$(cat hunt-rce/SKILL.md)" "Audit this PHP controller snippet for command injection"
 
-# Save as a permanent reusable prompt template
+# Save as a permanent prompt template
 cat subdomain-enumeration/SKILL.md | llm --system - --save sec-recon
 
-# Run with any provider (OpenAI, Anthropic, local Ollama models)
-llm -t sec-recon "Run reconnaissance on staging.example.com"
-llm -t sec-recon -m claude-3-5-sonnet "Audit cloud boundaries"
+# Run with any backend (local or cloud)
+llm -t sec-recon "Scan target boundaries for internal endpoints"
+llm -t sec-recon -m claude-3-5-sonnet "Assess cloud staging subdomains"
 ```
 
 #### C. Claude Code CLI (`claude`)
-Instruct Claude Code to load and follow any skill playbook during an interactive session or add it to project instructions:
+Reference specific playbooks interactively during an engagement:
 
 ```bash
-# Run interactively referencing the skill
-claude "Follow the playbook in ./subdomain-enumeration/SKILL.md and run recon on target.com"
+# Pass playbook as context to Claude Code
+claude "Follow the playbook in ./wstg-web-pentest/SKILL.md to test authentication boundaries"
 
-# Or append skill directly to project instructions (CLAUDE.md)
-cat subdomain-enumeration/SKILL.md >> CLAUDE.md
+# Append directly to project instructions
+cat 09-web-security/SKILL.md >> CLAUDE.md
 ```
 
 #### D. Fabric CLI (`fabric`)
-Export any skill into a native Fabric pattern:
+Export any skill to a native Fabric pattern:
 
 ```bash
-# Create custom pattern folder
-mkdir -p ~/.config/fabric/patterns/subdomain-recon
-
-# Copy the skill into the pattern system prompt
-cat subdomain-enumeration/SKILL.md > ~/.config/fabric/patterns/subdomain-recon/system.md
-
-# Execute pattern
-fabric -p subdomain-recon -u "https://example.com"
+mkdir -p ~/.config/fabric/patterns/threat-hunting
+cat 06-threat-hunting/SKILL.md > ~/.config/fabric/patterns/threat-hunting/system.md
+fabric -p threat-hunting < /var/log/syslog
 ```
 
 #### E. Mods CLI (`mods`)
-Pipe skill context directly into `mods` using any LLM backend:
+Pipe logs or network outputs through specialized skills:
 
 ```bash
-# Pipe skill file directly into mods prompt
-cat subdomain-enumeration/SKILL.md | mods "Execute the reconnaissance steps on target.com"
-
-# Using local Ollama backend via mods
-cat web-enumeration/SKILL.md | mods --model ollama/llama3.2 "Audit these endpoints"
+# Analyze Zeek connection logs with detection skill
+cat conn.log | mods "Using context in detecting-beaconing-patterns-with-zeek/SKILL.md, identify anomalies"
 ```
 
 #### F. Shell-GPT (`sgpt`) & AIChat (`aichat`)
-Create persistent roles for fast terminal execution:
+Create persistent command-line security roles:
 
 ```bash
-# Shell-GPT: create a custom role
-sgpt --create-role sec-recon < subdomain-enumeration/SKILL.md
-sgpt --role sec-recon "Perform subdomain discovery on example.com"
+# Shell-GPT role creation
+sgpt --create-role sec-analyst < 07-incident-response/SKILL.md
+sgpt --role sec-analyst "Analyze this suspicious base64 encoded PowerShell script"
 
-# AIChat: save as a role definition
+# AIChat role definition
 mkdir -p ~/.config/aichat/roles
-cat << 'EOF' > ~/.config/aichat/roles/recon.md
+cat << 'EOF' > ~/.config/aichat/roles/threat-hunter.md
 ---
 model: openai:gpt-4o
 ---
 EOF
-cat subdomain-enumeration/SKILL.md >> ~/.config/aichat/roles/recon.md
-aichat -r recon "Run assessment on target.com"
+cat 06-threat-hunting/SKILL.md >> ~/.config/aichat/roles/threat-hunter.md
+aichat -r threat-hunter "Review these authentication logs"
 ```
 
 ---
 
 ### 2. Python & Direct API Usage (OpenAI / Anthropic / Gemini)
 
-Dynamically load any skill and pass it as a `system` instruction in your code:
+Dynamically load any skill file and pass it as a `system` instruction in your automation scripts:
 
 ```python
 from pathlib import Path
@@ -123,21 +135,20 @@ from openai import OpenAI
 
 client = OpenAI()
 
-# Load the desired skill
-skill_path = Path("subdomain-enumeration/SKILL.md")
+# Load the target skill
+skill_path = Path("hunt-ssrf/SKILL.md")
 skill_prompt = skill_path.read_text(encoding="utf-8")
 
-# Query the model with the skill active
 response = client.chat.completions.create(
-    model="gpt-4o",  # or claude-3-5-sonnet, gemini-2.0-flash, etc.
+    model="gpt-4o",
     messages=[
         {
             "role": "system",
-            "content": f"You are an expert autonomous agent. You must strictly follow this operational skill:\n\n{skill_prompt}"
+            "content": f"You are an expert security auditor. Strictly follow this methodology:\n\n{skill_prompt}"
         },
         {
             "role": "user",
-            "content": "Perform initial reconnaissance on example.com"
+            "content": "Verify SSRF edge cases on a webhook URL parameter with internal redirect handling."
         }
     ]
 )
@@ -147,69 +158,67 @@ print(response.choices[0].message.content)
 
 ---
 
-### 3. Agent Frameworks (LangChain / CrewAI / AutoGen)
+### 3. Agent Frameworks (CrewAI, LangChain, AutoGen)
 
-Parse YAML metadata (`name`, `description`) to dynamically route tasks to appropriate skills:
+Dynamically register skills based on YAML frontmatter:
 
 ```python
 import yaml
 from pathlib import Path
 
-def load_skill(skill_dir: str):
+def load_security_skill(skill_dir: str):
     skill_file = Path(skill_dir) / "SKILL.md"
     content = skill_file.read_text(encoding="utf-8")
     
     parts = content.split("---", 2)
-    metadata = yaml.safe_load(parts[1])
-    instructions = parts[2].strip()
+    metadata = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+    instructions = parts[2].strip() if len(parts) >= 3 else content
     
     return {
-        "name": metadata.get("name"),
-        "description": metadata.get("description"),
+        "name": metadata.get("name", Path(skill_dir).name),
+        "description": metadata.get("description", ""),
+        "category": metadata.get("category", "Cybersecurity"),
         "instructions": instructions
     }
 
-# Example: register as a CrewAI or LangChain agent prompt/tool
-skill = load_skill("agent-arsenal/web-enumeration")
-print(f"Loaded: {skill['name']} - {skill['description']}")
+skill = load_security_skill("hunt-sqli")
+print(f"Loaded: [{skill['category']}] {skill['name']} - {skill['description']}")
 ```
 
 ---
 
-### 4. IDEs & Coding Agents (Cursor, Antigravity, Open WebUI)
+### 4. Coding Assistants & Agent CLI Environments
 
-Copy selected skills to your agent's local skills directory for automatic discovery:
+For agent environments that discover skills from standard directories:
 
 ```bash
-# For agents supporting local skills directories:
 mkdir -p ~/.agent/skills/
 
-# Copy one or multiple skills:
-cp -r agent-arsenal/subdomain-enumeration ~/.agent/skills/
-cp -r agent-arsenal/hunt-rce ~/.agent/skills/
+# Copy desired security skills
+cp -r 01-recon-osint ~/.agent/skills/
+cp -r hunt-rce ~/.agent/skills/
+cp -r wstg-web-pentest ~/.agent/skills/
 ```
-
-In chat interfaces like **Open WebUI**, **ChatGPT Custom GPTs**, or **Claude Projects**, upload or paste the `SKILL.md` directly into the system instructions or project knowledge files.
 
 ---
 
 ## Searching and Finding Skills
 
-With over 2,800 skills available, you can quickly locate skills using CLI tools:
+Quickly search through the 1,150+ security skills by technique, tool, or CVE:
 
 ```bash
 # Search by keyword in skill descriptions
-grep -rn "description:.*docker" --include="SKILL.md" .
+grep -rn "description:.*Active Directory" --include="SKILL.md" .
 
-# Search skills by category in YAML frontmatter
-grep -rn "category:.*Cloud Security" --include="SKILL.md" .
+# Search by MITRE ATT&CK ID
+grep -rn "mitre_attack:.*T1003" --include="SKILL.md" .
 
-# Find skill folders matching a keyword
-find . -maxdepth 1 -type d -name "*recon*"
+# Search skills by vulnerability class
+find . -maxdepth 1 -type d -name "*ssrf*"
 ```
 
 ---
 
-## License & Usage Policy
+## License & Operational Security Policy
 
-This repository is maintained for authorized security testing, code auditing, research, and infrastructure automation. Follow all applicable laws and terms of service when testing targets.
+All playbooks and verification procedures are strictly intended for authorized security audits, vulnerability triage, and defensive posture evaluation. When verifying defects, always adhere to non-destructive methodology and responsible disclosure standards.
